@@ -1,7 +1,8 @@
 import json
 from authlib.integrations.django_client import OAuth
 from django.conf import settings
-from django.shortcuts import redirect, render, redirect
+from django.shortcuts import redirect, render, HttpResponse
+from django.http import HttpResponseBadRequest
 from django.urls import reverse
 from urllib.parse import quote_plus, urlencode
 
@@ -16,6 +17,21 @@ oauth.register(
     },
     server_metadata_url=settings.ISSUER_ENDPOINT,
 )
+
+def launch(request):
+    iss = request.GET.get('iss')
+    if iss != settings.FHIR_ISS:
+        return HttpResponseBadRequest('Invalid iss: ' + iss + '. Expected ' + settings.FHIR_ISS)
+    launch = request.GET.get('launch')
+    if launch is None:
+        return HttpResponseBadRequest('Blank "iss" value received')
+    return oauth.auth0.authorize_redirect(
+        request, 
+        request.build_absolute_uri(reverse("callback")), 
+        aud=settings.FHIR_ISS,
+        launch=launch,
+        scope="openid fhirUser launch launch/patient"
+    )
 
 def login(request):
     return oauth.auth0.authorize_redirect(
