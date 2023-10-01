@@ -12,9 +12,9 @@ oauth.register(
     client_id=settings.AUTH0_CLIENT_ID,
     client_secret=settings.AUTH0_CLIENT_SECRET,
     client_kwargs={
-        "scope": "openid profile email",
+        "scope": "openid fhirUser",
     },
-    server_metadata_url=f"https://{settings.AUTH0_DOMAIN}/.well-known/openid-configuration",
+    server_metadata_url=settings.ISSUER_ENDPOINT,
 )
 
 def login(request):
@@ -24,29 +24,36 @@ def login(request):
 
 def callback(request):
     token = oauth.auth0.authorize_access_token(request)
+    resp = oauth.auth0.get(token.get('userinfo').get('fhirUser'), token=token, headers = {
+        'Accept': 'application/json'
+    })
+    resp.raise_for_status()
+    fhirUser = resp.json()    
     request.session["user"] = token
+    request.session["fhirUser"] = fhirUser
     return redirect(request.build_absolute_uri(reverse("index")))
 
 def logout(request):
     request.session.clear()
 
-    return redirect(
-        f"https://{settings.AUTH0_DOMAIN}/v2/logout?"
-        + urlencode(
-            {
-                "returnTo": request.build_absolute_uri(reverse("index")),
-                "client_id": settings.AUTH0_CLIENT_ID,
-            },
-            quote_via=quote_plus,
-        ),
-    )
+    return redirect(request.build_absolute_uri(reverse("index")))
 
 def index(request):
-    return render(
-        request,
-        "index.html",
-        context={
-            "session": request.session.get("user"),
-            "pretty": json.dumps(request.session.get("user"), indent=4),
-        },
-    )
+    user = request.session.get("user")
+    fhirUser = request.session.get("fhirUser")
+    if user is None:
+        return render(
+            request,
+            "index.html",
+        )
+    else:
+        return render(
+            request,
+            "index.html",
+            context={
+                "session": user,
+                "username": fhirUser.get('name')[0].get('text'),
+                "pretty": json.dumps(user, indent=4),
+                "fhirUser": json.dumps(fhirUser, indent=4),
+            },
+        )

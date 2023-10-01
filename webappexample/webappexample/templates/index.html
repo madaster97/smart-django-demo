@@ -1,13 +1,20 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Auth0 Example</title>
+  <title>Standalone Launch Example</title>
 </head>
 <body>
 {% if session %}
-  <h1>Welcome {{session.userinfo.name}}!</h1>
+<h1>Welcome {{username}}!</h1>
   <p><a href="{% url 'logout' %}">Logout</a></p>
-  <div><pre>{{pretty}}</pre></div>
+  <details>
+    <summary>fhirUser</summary>
+    <div><pre>{{fhirUser}}</pre></div>
+  </details>
+  <details>
+    <summary>token response</summary>
+    <div><pre>{{pretty}}</pre></div>
+  </details>
 {% else %}
   <h1>Welcome Guest</h1>
   <p><a href="{% url 'login' %}">Login</a></p>
