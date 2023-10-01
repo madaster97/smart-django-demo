@@ -132,5 +132,6 @@ if ENV_FILE:
 
 # Load Auth0 application settings into memory
 ISSUER_ENDPOINT = os.environ.get("ISSUER_ENDPOINT")
+FHIR_ISS = os.environ.get("FHIR_ISS")
 AUTH0_CLIENT_ID = os.environ.get("AUTH0_CLIENT_ID")
 AUTH0_CLIENT_SECRET = os.environ.get("AUTH0_CLIENT_SECRET")

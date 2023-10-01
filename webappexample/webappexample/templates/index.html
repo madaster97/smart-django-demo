@@ -5,11 +5,15 @@
 </head>
 <body>
 {% if session %}
-<h1>Welcome {{username}}!</h1>
+<h1>Welcome {{username}}! Seeing patient {{patientName}}</h1>
   <p><a href="{% url 'logout' %}">Logout</a></p>
   <details>
     <summary>fhirUser</summary>
     <div><pre>{{fhirUser}}</pre></div>
+  </details>
+  <details>
+    <summary>patient</summary>
+    <div><pre>{{patient}}</pre></div>
   </details>
   <details>
     <summary>token response</summary>
