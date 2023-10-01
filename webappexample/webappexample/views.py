@@ -33,10 +33,10 @@ def launch(request):
         scope="openid fhirUser launch launch/patient"
     )
 
-def login(request):
-    return oauth.auth0.authorize_redirect(
-        request, request.build_absolute_uri(reverse("callback")), aud=settings.FHIR_ISS, 
-    )
+# def login(request):
+#     return oauth.auth0.authorize_redirect(
+#         request, request.build_absolute_uri(reverse("callback")), aud=settings.FHIR_ISS, 
+#     )
 
 def callback(request):
     token = oauth.auth0.authorize_access_token(request)
